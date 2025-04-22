@@ -1,0 +1,66 @@
+server:
+  port:
+    8085
+
+spring:
+  application:
+    name: quartz
+  liquibase:
+    change-log: classpath:/db/changelog.xml
+  datasource:
+    url: jdbc:mysql://localhost:3306/patient_db?createDatabaseIfNotExist=true
+    username: root
+    password: P@ssw0rd
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true     # enable this to show the generated SQL in the console
+    properties:
+#      hibernate.dialect: org.hibernate.dialect.MySQLDialect
+      hibernate.format_sql: true
+      hibernate.use_sql_comments: true
+      hibernate.naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+      comment-prefix: '#'
+    data-source: primary
+    properties:
+      org.quartz.jobStore:
+        isClustered: true
+        class: org.quartz.impl.jdbcjobstore.JobStoreTX
+        driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+        tablePrefix: qrtz_
+        dataSource: dataSource
+      org.quartz.scheduler:
+        instanceName: quartzSchedulerCron
+        instanceId: AUTO
+      org.quartz.threadPool:
+        class: org.quartz.simpl.SimpleThreadPool
+        threadCount: 10
+springdoc:
+  api-docs:
+    path: /quartz-api-docs
+  packages-to-scan: com.project.quartz.controller
+  swagger-ui:
+    filter: true
+    operationsSorter: method
+    path: /quartz-documentation
+    tagsSorter: alpha
+    tryItOutEnabled: true
+openapi:
+  dev-url: http://localhost:${server.port}
+  prod-url: https://prod-api.com
+
+logging:
+  level:
+    org:
+      quartz: DEBUG
+      springframework: DEBUG
+    com:
+      zaxxer:
+        hikari: DEBUG
